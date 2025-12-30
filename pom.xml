@@ -27,5 +27,6 @@
 		<module>spring-authentication-jwt-security-service</module>
 		<module>springsecsection1</module>
 		<module>springsecsection2</module>
+		<module>springsecsection3</module>
 	</modules>
 </project>
