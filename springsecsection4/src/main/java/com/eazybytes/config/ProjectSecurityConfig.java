@@ -21,7 +21,8 @@ public class ProjectSecurityConfig {
 	@Bean
 	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
-		http.authorizeHttpRequests(
+		http.csrf(csrfConfig -> csrfConfig.disable())
+		       .authorizeHttpRequests(
 				(requests) -> requests.requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards")
 						.authenticated().requestMatchers("/notices", "/contact", "/error").permitAll());
 
@@ -30,12 +31,13 @@ public class ProjectSecurityConfig {
 		return http.build();
 
 	}
-
-	@Bean
-	public UserDetailsService userDetailsService(DataSource datasource) {
-		return new JdbcUserDetailsManager(datasource);
-
-	}
+	
+	/*
+	  @Bean public UserDetailsService userDetailsService(DataSource datasource) {
+	  return new JdbcUserDetailsManager(datasource);
+	  
+	  }
+	  If custom database/table is used */
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
