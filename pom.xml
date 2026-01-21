@@ -29,5 +29,7 @@
 		<module>springsecsection2</module>
 		<module>springsecsection3</module>
 		<module>springsecsection4</module>
+		<module>springsecsection5</module>
+		<module>springsecsection6</module>
 	</modules>
 </project>
