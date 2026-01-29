@@ -28,7 +28,7 @@ public class ProjectSecurityProdConfig {
 		.requiresChannel(rcc -> rcc.anyRequest().requiresSecure()) // only HTTPS
 		.csrf(csrfConfig -> csrfConfig.disable())
 		       .authorizeHttpRequests(
-				(requests) -> requests.requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards")
+				(requests) -> requests.requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards","/user")
 						.authenticated().requestMatchers("/notices", "/contact", "/error","/register","/invalidSession").permitAll());
 
 		http.formLogin(withDefaults()); // If Form style login is required

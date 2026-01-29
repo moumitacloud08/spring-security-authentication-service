@@ -1,5 +1,6 @@
 package com.eazybytes.controller;
 
+import java.sql.Date;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ public class UserController {
 		try {
 			String hashPwd = passwordEncoder.encode(customer.getPwd());
 			customer.setPwd(hashPwd);
-
+			customer.setCreateDt(new Date(System.currentTimeMillis()));
 			Customer savedCustomer = customerRepository.save(customer);
 
 			if (savedCustomer.getId() > 0) {
