@@ -1,14 +1,30 @@
 package com.eazybytes.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.eazybytes.model.AccountTransactions;
+import com.eazybytes.repository.AccountTransactionsRepository;
+
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 public class BalanceController {
 	
+	private final AccountTransactionsRepository accountTransactionsRepository;
+	
 	@GetMapping("/myBalance")
-	public  String getBalanceDetails () {
-        return "Here are the balance details from the DB";
+	public  List<AccountTransactions> getBalanceDetails (@RequestParam long id) {
+		List<AccountTransactions> accountTransactions = accountTransactionsRepository.findByCustomerIdOrderByTransactiondtDesc(id);
+		if(accountTransactions != null) {
+			return accountTransactions;
+		}else {
+			return null;
+		}
     }
 
 	
