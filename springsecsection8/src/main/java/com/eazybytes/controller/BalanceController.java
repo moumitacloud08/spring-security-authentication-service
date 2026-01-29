@@ -19,7 +19,7 @@ public class BalanceController {
 	
 	@GetMapping("/myBalance")
 	public  List<AccountTransactions> getBalanceDetails (@RequestParam long id) {
-		List<AccountTransactions> accountTransactions = accountTransactionsRepository.findByCustomerIdOrderByTransactiondtDesc(id);
+		List<AccountTransactions> accountTransactions = accountTransactionsRepository.findByCustomerIdOrderByTransactionDtDesc(id);
 		if(accountTransactions != null) {
 			return accountTransactions;
 		}else {
