@@ -9,15 +9,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import com.eazybytes.exceptionhandling.CustomAccessDeniedhandler;
 import com.eazybytes.exceptionhandling.CustomBasicAuthenticationEntryPoint;
+import com.eazybytes.filter.CsrfCookieFilter;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -28,7 +33,11 @@ public class ProjectSecurityConfig {
 	@Bean
 	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
+		CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler = new CsrfTokenRequestAttributeHandler();
+		
 		http
+		.securityContext(contextConfig -> contextConfig.requireExplicitSave(false))
+		.sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
 		.cors(corsConfig -> corsConfig.configurationSource(new CorsConfigurationSource() {
 			
 			@Override
@@ -42,10 +51,13 @@ public class ProjectSecurityConfig {
 				return config;
 			}
 		}))
-		.sessionManagement(smc -> smc.invalidSessionUrl("/invalidSession").maximumSessions(3).maxSessionsPreventsLogin(true))
+		.csrf(csrfConfig -> csrfConfig
+				.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
+				.ignoringRequestMatchers("/contact","/register")
+				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+		.addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
 		.requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()) //only HTTP
-		.csrf(csrfConfig -> csrfConfig.disable())
-		       .authorizeHttpRequests(
+		 .authorizeHttpRequests(
 				(requests) -> requests
 				.requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards","/user")
 						.authenticated()
@@ -54,8 +66,6 @@ public class ProjectSecurityConfig {
 
 		http.formLogin(withDefaults()); // If Form style login is required
 		http.httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));  // only for login
-		//http.exceptionHandling(ehc -> ehc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint())); //Global config,  for all the flow
-		//http.exceptionHandling(ehc -> ehc.accessDeniedHandler(new CustomAccessDeniedhandler()).accessDeniedPage("/denied"));
 		http.exceptionHandling(ehc -> ehc.accessDeniedHandler(new CustomAccessDeniedhandler()));
 		return http.build();
 
