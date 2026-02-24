@@ -45,7 +45,7 @@ public class ProjectSecurityProdConfig {
 			@Override
 			public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 				CorsConfiguration config = new CorsConfiguration();
-				config.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+				config.setAllowedOrigins(Collections.singletonList("https://localhost:4200"));
 				config.setAllowedMethods(Collections.singletonList("*"));
 				config.setAllowCredentials(true);
 				config.setAllowedHeaders(Collections.singletonList("*"));
@@ -60,8 +60,18 @@ public class ProjectSecurityProdConfig {
         .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
 		.requiresChannel(rcc -> rcc.anyRequest().requiresSecure()) // only HTTPS
 		.authorizeHttpRequests(
-				(requests) -> requests.requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards","/user")
-						.authenticated().requestMatchers("/notices", "/contact", "/error","/register","/invalidSession").permitAll());
+				(requests) -> requests
+//				.requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
+//				.requestMatchers("/myBalance").hasAnyAuthority("VIEWBALANCE","VIEWACCOUNT")
+//				.requestMatchers("/myLoans").hasAuthority("VIEWLOANS")
+//				.requestMatchers( "/myCards").hasAuthority("VIEWCARDS")
+				
+				.requestMatchers("/myAccount").hasRole("USER")
+				.requestMatchers("/myBalance").hasAnyRole("USER","ADMIN")
+				.requestMatchers("/myLoans").hasRole("USER")
+				.requestMatchers( "/myCards").hasRole("USER")
+				.requestMatchers("/user").authenticated()
+				.requestMatchers("/notices", "/contact", "/error","/register","/invalidSession").permitAll());
 
 		http.formLogin(withDefaults()); // If Form style login is required
 		http.httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint())); // only works for login
